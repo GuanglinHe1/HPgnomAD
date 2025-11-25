@@ -90,8 +90,39 @@ Required R packages:
 - `tidyverse`
 - `RColorBrewer`
 
+## 3. UMAP projection of PCA components
+
+Script: `script/UMAP.py`
+
+This script reads the PLINK `.eigenvec` file and projects the selected principal components into two dimensions using UMAP.
+
+### Usage
+
+```bash
+python script/UMAP.py \
+    --input ../filtered_PCA/hpglobal_LD_PCA.eigenvec \
+    --n_pcs 10 \
+    --n_neighbors 10 \
+    --min_dist 0.1 \
+    --output UMAP.csv
+```
+
+Only `--input` is required. Set `--output` to save a CSV with sample IDs and UMAP coordinates; omit it to only print to stdout.
+
+### Output
+
+- Console display of all samples with their `V1` and `V2` coordinates.
+- Variance and variance explained for both UMAP dimensions.
+- Optional CSV file with `FID`, `IID`, `V1`, and `V2` columns.
+
+### Dependencies
+
+- Python 3.8+
+- `numpy`
+- `pandas`
+- `umap-learn`
+
 ## Notes
 
 - Paths in the scripts are relative so they can be moved as a group without exposing machine-specific absolute paths.
 - If you change where the input VCF or PCA tables are stored, update the relative paths in the scripts accordingly.
-
