@@ -1,9 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-用法:
+Usage:
   python3 coords_to_csv.py <input_coords_tsv> <output_directory>
 
-遍历单个 coords.tsv 文件，根据对齐区间标记参考基因组未对齐位点，
-输出同名 .csv 到指定目录，只保留 aligned == 'N' 的行。
+Traverse a single coords.tsv file, mark unaligned positions on the reference
+genome based on alignment intervals, and output a same-named .csv file to the
+specified directory, keeping only rows with aligned == 'N'.
 """
 
 import os
@@ -12,13 +15,13 @@ import sys
 
 def parse_coords(coords_path):
     """
-    解析 show-coords -rclT 输出文件，提取所有参考序列对齐区间 (s1,e1)，
-    并从首条数据行获取参考序列长度 LEN R。
+    Parse show-coords -rclT output, extract all reference alignment intervals
+    (s1, e1), and obtain reference sequence length LEN R from the first data row.
     """
     blocks = []
     ref_len = None
     with open(coords_path, 'r') as f:
-        # 定位表头行
+        # Locate header line
         for line in f:
             line = line.rstrip('\n')
             if line.startswith('[S1]'):
@@ -28,8 +31,8 @@ def parse_coords(coords_path):
                 idx_lenr = header.index('[LEN R]')
                 break
         else:
-            raise RuntimeError("coords 文件缺少 [S1] 表头行")
-        # 读取后续数据行
+            raise RuntimeError("coords file missing [S1] header line")
+        # Read subsequent data lines
         for line in f:
             line = line.strip()
             if not line or line.startswith('['):
@@ -41,7 +44,7 @@ def parse_coords(coords_path):
             if ref_len is None:
                 ref_len = int(cols[idx_lenr])
     if ref_len is None:
-        raise RuntimeError("无法从 coords 文件中获取参考序列长度")
+        raise RuntimeError("Unable to obtain reference sequence length from coords file")
     return blocks, ref_len
 
 def main():
@@ -53,8 +56,10 @@ def main():
     output_dir = sys.argv[2]
     os.makedirs(output_dir, exist_ok=True)
 
+    # Parse coords
     blocks, ref_length = parse_coords(coords_tsv)
 
+    # Mark unaligned positions (1-based)
     covered = [False] * (ref_length + 1)
     for s, e in blocks:
         start = max(1, s)
@@ -62,9 +67,12 @@ def main():
         for pos in range(start, end + 1):
             covered[pos] = True
 
+    # Build output file path: same name, suffix .tsv -> .csv
     base = os.path.basename(coords_tsv)
+    name = base.rsplit('.', 1)[0]  # strip .tsv
     out_path = os.path.join(output_dir, f"{name}.csv")
 
+    # Write CSV, keeping only aligned == 'N'
     with open(out_path, 'w', newline='') as fo:
         writer = csv.writer(fo)
         writer.writerow(['pos', 'aligned'])
@@ -76,4 +84,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -31,78 +31,78 @@ Notes:
 - If merging or indexing fails, the script will output an error message and terminate.
 
 Author: LLT
-日期: 2025年7月3日
+Date: 2025-07-03
 '
 #!/bin/bash
 
-# 配置文件路径
+# Configuration paths
 input_list='../conf/VCF2merge.list.txt'
 output_file='../merged.vcf.gz'
 
-# 检查输入文件是否存在
+# Check whether the input file exists
 if [ ! -f "$input_list" ]; then
-    echo "错误: 输入文件列表不存在: $input_list"
+    echo "Error: Input file list does not exist: $input_list"
     exit 1
 fi
 
-# 检查输入文件是否为空
+# Check whether the input file is empty
 if [ ! -s "$input_list" ]; then
-    echo "错误: 输入文件列表为空: $input_list"
+    echo "Error: Input file list is empty: $input_list"
     exit 1
 fi
 
-# 创建输出目录（如果不存在）
+# Create the output directory if missing
 output_dir=$(dirname "$output_file")
 mkdir -p "$output_dir"
 
-# 检查列表中的VCF文件是否都存在
-echo "检查VCF文件是否存在..."
+# Verify that all VCF files in the list exist
+echo "Checking whether VCF files exist..."
 while IFS= read -r vcf_file; do
-    # 跳过空行和注释行
+    # Skip empty lines and comments
     [[ -z "$vcf_file" || "$vcf_file" =~ ^[[:space:]]*# ]] && continue
     
     if [ ! -f "$vcf_file" ]; then
-        echo "错误: VCF文件不存在: $vcf_file"
+        echo "Error: VCF file does not exist: $vcf_file"
         exit 1
     fi
     echo "  ✓ $vcf_file"
 done < "$input_list"
 
-# 统计要合并的文件数量
+# Count the number of files to merge
 vcf_count=$(grep -v '^[[:space:]]*$\|^[[:space:]]*#' "$input_list" | wc -l)
-echo "将要合并 $vcf_count 个VCF文件"
+echo "Preparing to merge $vcf_count VCF files"
 
-# 使用bcftools合并VCF文件
-echo "开始合并VCF文件..."
-echo "输出文件: $output_file"
+# Merge VCF files with bcftools
+echo "Starting VCF merge..."
+echo "Output file: $output_file"
 
-# 合并命令
+# Merge command
 bcftools merge \
     --file-list "$input_list" \
     --output-type z \
     --output "$output_file" \
     --threads 32
 
-# 检查合并是否成功
+# Check whether merging succeeded
 if [ $? -eq 0 ]; then
-    echo "✓ VCF文件合并成功: $output_file"
+    echo "✓ VCF merge succeeded: $output_file"
     
-    # 创建索引文件
-    echo "创建索引文件..."
+    # Create index file
+    echo "Creating index file..."
     bcftools index "$output_file" --threads 32
     
     if [ $? -eq 0 ]; then
-        echo "✓ 索引文件创建成功"
+        echo "✓ Index file created successfully"
     else
-        echo "警告: 索引文件创建失败"
+        echo "Warning: Index file creation failed"
     fi
     
-    # 显示合并后文件的基本信息
-    echo "合并后文件信息:"
-    echo "  文件大小: $(du -h "$output_file" | cut -f1)"
+    # Show basic information of the merged file
+    echo "Merged file info:"
+    echo "  File size: $(du -h "$output_file" | cut -f1)"
 else
-    echo "错误: VCF文件合并失败"
+    echo "Error: VCF merge failed"
     exit 1
 fi
 
-echo "合并完成!"
+echo "Merge completed!"
