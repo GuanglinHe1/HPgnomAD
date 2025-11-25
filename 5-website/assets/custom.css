@@ -1,0 +1,201 @@
+/* assets/custom.css */
+
+/* Global background and typography */
+body {
+  background-color: #F5F5F5;    /* NCBI-inspired light gray background */
+  font-family: Arial, "Segoe UI", Tahoma, sans-serif;
+  color: #333;
+  transition: background-color 0.3s ease;  /* Subtle transition for theme changes */
+}
+
+/* Header container */
+.header-container {
+  background-color: #EEEEEE;    /* Pale gray top bar */
+  padding: 1rem 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #CCCCCC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);  /* Soft drop shadow */
+  transition: all 0.3s ease;  /* Smooth hover animation */
+}
+
+.header-container:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);  /* Darker shadow on hover */
+  transform: translateY(-1px);  /* Slight lift */
+}
+
+/* Site title */
+.site-title {
+  margin: 0;
+  color: #005EA5;               /* Deep blue primary color */
+  font-size: 1.75rem;
+  font-weight: bold;
+  transition: color 0.3s ease, transform 0.2s ease;  /* Smooth focus animation */
+}
+
+.site-title:hover {
+  color: #0077cc;  /* Slightly lighter hue */
+  transform: scale(1.02);  /* Gentle zoom */
+}
+
+/* Navigation bar */
+.navbar-custom {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Default nav link style */
+.nav-link-custom {
+  color: #005EA5;               /* Deep blue */
+  font-size: 1rem;
+  padding: 0.5rem 1rem;  /* Larger horizontal padding */
+  border-radius: 0.25rem;
+  text-decoration: none;
+  transition: all 0.3s ease;  /* Smooth hover animation */
+  position: relative;  /* Prepare for underline animation */
+  overflow: hidden;  /* Hide overflow */
+}
+
+/* Nav link hover effect */
+.nav-link-custom:hover {
+  background-color: #D55E00;    /* Accent orange */
+  color: #FFFFFF;
+  transform: translateY(-2px);  /* Lift effect */
+  box-shadow: 0 2px 4px rgba(213,94,0,0.2);  /* Hover shadow */
+}
+
+/* Nav link active click effect */
+.nav-link-custom:active {
+  transform: translateY(1px);  /* Pressed effect */
+  box-shadow: none;
+}
+
+/* Active nav link */
+.nav-link-custom.active {
+  background-color: #005EA5;    /* Deep blue fill */
+  color: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0,94,165,0.2);  /* Active shadow */
+}
+
+/* Main content container */
+.main-container {
+  background-color: #FFFFFF;
+  padding: 2rem;
+  border-radius: 0.5rem;  /* Larger rounded corners */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);  /* Gentle shadow */
+  transition: all 0.3s ease;  /* Smooth hover animation */
+  margin: 0 auto;  /* Center container */
+  max-width: 1400px;  /* Restrict maximum width */
+}
+
+/* Homepage special handling */
+.homepage-bg.main-container {
+  background-color: transparent;
+}
+
+.main-container:hover {
+  box-shadow: 0 6px 12px rgba(0,0,0,0.1);  /* Darker hover shadow */
+  transform: translateY(-2px);  /* Slight lift */
+}
+
+/* Homepage background image */
+.main-container.homepage-bg {
+  position: relative;
+  overflow: hidden;
+  background: transparent !important;  /* Force transparent background */
+}
+
+.main-container.homepage-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://picturerealm.oss-cn-chengdu.aliyuncs.com/obsidian/dna-8895875.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  z-index: 0;
+  border-radius: 0.5rem;
+}
+
+.main-container.homepage-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.main-container.homepage-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Footer */
+.footer-container {
+  text-align: center;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #666666;
+  transition: all 0.3s ease;  /* Smooth hover animation */
+  border-top: 1px solid transparent;  /* Transparent divider */
+}
+
+.footer-container:hover {
+  color: #333333;
+  border-top-color: #CCCCCC;  /* Show border on hover */
+}
+
+/* Button enhancements */
+.btn-primary {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,94,165,0.2);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Input enhancements */
+.form-control {
+  transition: all 0.3s ease;
+  border: 2px solid #005EA5;  /* Blue border */
+  box-shadow: 0 0 3px rgba(0,94,165,0.2);  /* Subtle drop shadow */
+}
+
+.form-control:focus {
+  border-color: #005EA5;
+  box-shadow: 0 0 0 3px rgba(0,94,165,0.3);  /* Stronger focus halo */
+  transform: translateY(-1px);
+}
+
+.form-control:hover {
+  box-shadow: 0 0 5px rgba(0,94,165,0.3);
+}
+
+/* Specialized search box styling */
+.search-box {
+  border: 2px solid #005EA5 !important;  /* Force blue border */
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0,94,165,0.2);
+}
+
+.search-box:focus {
+  border-color: #0077cc !important;
+  box-shadow: 0 0 8px rgba(0,94,165,0.4);
+  outline: none;
+}
+
+/* Loading animation refinement */
+.loading-spinner {
+  transition: all 0.3s ease;
+}
