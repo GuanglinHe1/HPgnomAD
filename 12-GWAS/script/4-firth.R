@@ -6,8 +6,9 @@ suppressPackageStartupMessages({
   library(logistf)
 })
 
-base_dir <- 'Version2'
-meta_path <- file.path(base_dir, 'META/Clinical.csv')
+args <- commandArgs(trailingOnly = TRUE)
+base_dir <- if (length(args) >= 1) args[1] else '.'
+meta_path <- file.path(base_dir, 'META/clinical_metadata.csv')
 geno_path <- file.path(base_dir, 'data/geno_biallelic_SNP.txt')
 lead_base <- file.path(base_dir, 'data/lead_hits')
 out_base <- file.path(base_dir, 'output/lead_hits_firth')
@@ -24,7 +25,15 @@ meta$Gender <- as.factor(meta$Gender)
 meta$Ethnicity <- as.factor(meta$Ethnicity)
 meta$City <- as.factor(meta$City)
 
-score_traits <- c('Atrophyscore', 'Intestinalmetaplasiascore')
+# Optional disease-type covariate (use first available column)
+disease_candidates <- c('DiseaseType', 'EndoscopicFindings')
+disease_col <- disease_candidates[disease_candidates %in% colnames(meta)]
+disease_col <- if (length(disease_col) > 0) disease_col[1] else NA_character_
+if (!is.na(disease_col)) {
+  meta[[disease_col]] <- as.factor(meta[[disease_col]])
+}
+
+score_traits <- c('AtrophyScore', 'IntestinalMetaplasiaScore')
 
 message('Loading genotype matrix...')
 geno <- read.table(geno_path, header = TRUE, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
@@ -36,7 +45,7 @@ geno$ps <- as.integer(geno$ps)
 all_results <- list()
 
 for (trait in traits) {
-  lead_file <- file.path(lead_base, trait, 'GWAS和FST交集位点.csv')
+  lead_file <- file.path(lead_base, trait, 'lead_hits.csv')
   if (!file.exists(lead_file)) {
     warning('Missing lead hits file for trait: ', trait)
     next
@@ -99,7 +108,11 @@ for (trait in traits) {
     df <- df[df$allele %in% c(major, minor), ]
     df$geno_minor <- ifelse(df$allele == minor, 1, 0)
 
-    df <- df[complete.cases(df[, c('pheno', 'geno_minor', 'Age', 'Gender', 'Ethnicity', 'City')]), ]
+    req_cols <- c('pheno', 'geno_minor', 'Age', 'Gender', 'Ethnicity', 'City')
+    if (!is.na(disease_col)) {
+      req_cols <- c(req_cols, disease_col)
+    }
+    df <- df[complete.cases(df[, req_cols]), ]
 
     if (nrow(df) < 10) {
       next
@@ -110,6 +123,9 @@ for (trait in traits) {
     }
 
     covars <- c('Age', 'Gender', 'Ethnicity', 'City')
+    if (!is.na(disease_col) && disease_col != trait) {
+      covars <- c(covars, disease_col)
+    }
     covars_keep <- c()
     for (cv in covars) {
       if (!cv %in% colnames(df)) next
